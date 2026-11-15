@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIRIUS: a second pair of eyes</title>
+<meta name="description" content="SIRIUS is a prototype that uses two cameras to tell a blind or low-vision person what is in front of them and how far away it is, in a few spoken words.">
+<link rel="canonical" href="https://ritvikdayal.github.io/sirius/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="SIRIUS: a second pair of eyes">
+<meta property="og:description" content="Two cameras look ahead. A voice says what is there and how far away it is. A research prototype for people who are blind or have low vision.">
+<meta property="og:url" content="https://ritvikdayal.github.io/sirius/">
+<meta property="og:image" content="https://ritvikdayal.github.io/sirius/social.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&display=swap" rel="stylesheet">
+<style>
+  :root { --black:#000; --amber:#FFB23F; --urgent:#FF5A36; --aware:#B8935A; --left:#FF7A3D; --right:#FFE2A8; --bone:#EDE6DA; --muted:#A79F92; --line:#2a2520; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  html, body { overflow-x: clip; }
+  body { margin: 0; background: var(--black); color: var(--bone); font-family: Archivo, system-ui, sans-serif; font-size: 18px; line-height: 1.55; }
+  a { color: var(--bone); text-underline-offset: 4px; }
+  a:hover { color: var(--amber); }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--amber); outline-offset: 4px; }
+  .skip { position: absolute; left: 16px; top: -60px; background: var(--amber); color: var(--black); padding: 10px 14px; z-index: 10; font-weight: 600; }
+  .skip:focus { top: 12px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  .no-webgl canvas { display: none; }
+  .obj-label { position: fixed; z-index: 1; pointer-events: none; transform: translate(-50%, -100%); white-space: nowrap; font-weight: 700; font-size: 17px; font-variation-settings: "wdth" 120; opacity: 0; transition: opacity .4s; text-shadow: 0 0 14px #000, 0 0 4px #000; }
+  .obj-label small { display: block; font-size: 12px; font-weight: 500; opacity: .85; font-variation-settings: "wdth" 100; }
+
+  header.top { position: absolute; z-index: 5; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 26px 40px; font-size: 15px; }
+  .brand { font-weight: 700; font-variation-settings: "wdth" 125; letter-spacing: .04em; text-decoration: none; }
+  header nav a { margin-left: 26px; text-decoration: none; }
+
+  .hero { position: relative; z-index: 2; min-height: 100vh; min-height: 100svh; display: grid; grid-template-rows: 1fr auto; padding: 96px 40px 30px; }
+  .copy { align-self: end; max-width: 640px; position: relative; }
+  .copy::before { content: ""; position: absolute; inset: -90px -150px -60px -90px; z-index: -1; background: radial-gradient(closest-side, rgba(0,0,0,.85), rgba(0,0,0,.6) 60%, transparent); pointer-events: none; }
+  h1 { margin: 0; font-weight: 800; font-variation-settings: "wdth" 125; font-size: clamp(64px, 12vw, 176px); line-height: .84; letter-spacing: -.02em; }
+  .lede { font-size: clamp(22px, 2.3vw, 33px); line-height: 1.2; margin: 22px 0 0; font-variation-settings: "wdth" 108; font-weight: 500; max-width: 24ch; }
+  .explain { font-size: 17px; line-height: 1.6; color: var(--muted); margin: 16px 0 0; max-width: 52ch; }
+  .explain em { color: var(--amber); font-style: normal; }
+  .explain .l { color: var(--left); } .explain .r { color: var(--right); }
+  .controls { display: flex; gap: 16px; align-items: center; margin-top: 26px; flex-wrap: wrap; }
+  button.hear { font: inherit; font-size: 16px; font-weight: 600; color: var(--black); background: var(--amber); border: 0; border-radius: 999px; padding: 12px 22px; cursor: pointer; }
+  button.hear[aria-pressed="true"] { background: var(--bone); }
+  button.hear:disabled { background: #3a332b; color: var(--muted); cursor: not-allowed; }
+  .caption { margin: 0; font-size: clamp(19px, 1.9vw, 27px); font-variation-settings: "wdth" 112; font-weight: 600; color: var(--amber); min-height: 1.3em; }
+  .caption.urgent { color: var(--urgent); }
+  .facts { display: grid; grid-template-columns: repeat(5, auto); gap: 10px 38px; justify-content: start; margin: 32px 0 0; padding-top: 18px; border-top: 1px solid var(--line); font-size: 15px; color: var(--muted); }
+  .facts dt { color: var(--bone); font-size: 23px; font-weight: 700; font-variation-settings: "wdth" 115; }
+  .facts dd { margin: 0; }
+
+  .band { position: relative; z-index: 2; background: var(--black); padding: 120px 40px; border-top: 1px solid var(--line); }
+  .wrap { max-width: 1120px; margin: 0 auto; }
+  h2 { font-size: clamp(38px, 5.4vw, 76px); font-variation-settings: "wdth" 120; line-height: .95; margin: 0 0 18px; font-weight: 800; letter-spacing: -.01em; max-width: 16ch; }
+  .intro { color: var(--muted); max-width: 60ch; margin: 0 0 48px; }
+  ol.steps { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 28px; counter-reset: step; }
+  ol.steps li { counter-increment: step; border-top: 2px solid var(--amber); padding-top: 16px; }
+  ol.steps li::before { content: counter(step); display: block; color: var(--amber); font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+  h3 { margin: 0 0 8px; font-size: 26px; font-variation-settings: "wdth" 118; font-weight: 750; }
+  ol.steps p { margin: 0; color: #cfc6b8; font-size: 16px; line-height: 1.6; }
+  .zones { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px; }
+  .zone { border-top: 4px solid var(--c); padding-top: 16px; }
+  .zone p { color: var(--muted); margin: 6px 0 0; font-size: 16px; }
+  .zone q { display: block; color: var(--c); font-weight: 600; margin-top: 14px; font-size: 19px; quotes: none; }
+  .quiet { max-width: 62ch; color: var(--muted); margin-top: 52px; }
+  .status { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 34px; }
+  .status ul { margin: 0; padding-left: 1.1em; color: #cfc6b8; font-size: 16px; }
+  .status li + li { margin-top: 8px; }
+  .cane { margin-top: 48px; border-left: 3px solid var(--amber); padding-left: 18px; max-width: 60ch; }
+  .links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px; }
+  .links a { display: block; text-decoration: none; border-top: 1px solid var(--line); padding-top: 18px; }
+  .links a strong { display: block; font-size: 26px; font-variation-settings: "wdth" 118; }
+  .links a span { color: var(--muted); font-size: 16px; }
+  .links a:hover strong { color: var(--amber); }
+  footer { position: relative; z-index: 2; background: var(--black); border-top: 1px solid var(--line); padding: 36px 40px; color: var(--muted); font-size: 15px; display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+
+  @media (max-width: 900px) {
+    ol.steps { grid-template-columns: 1fr 1fr; }
+    .zones, .status, .links { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 760px) {
+    header.top { padding: 20px 18px; }
+    header nav a { margin-left: 14px; }
+    header nav a.optional { display: none; }
+    .hero { padding: 84px 18px 24px; }
+    .band { padding: 80px 18px; }
+    footer { padding: 28px 18px; }
+    .facts { grid-template-columns: 1fr 1fr; gap: 14px 24px; }
+    ol.steps { grid-template-columns: 1fr; }
+    .copy::before { inset: -60px -18px -40px -18px; background: rgba(0,0,0,.55); filter: blur(24px); }
+    canvas { opacity: .55; }
+    #labels { display: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#top">Skip to main content</a>
+<canvas id="scene" aria-hidden="true"></canvas>
+<div id="labels"></div>
+
+<header class="top">
+  <a class="brand" href="#top">SIRIUS</a>
+  <nav aria-label="Sections">
+    <a href="#how">How it works</a><a class="optional" href="#says">What it says</a><a class="optional" href="#status">Status</a><a href="https://github.com/RitvikDayal/sirius">Source</a>
+  </nav>
+</header>
+
+<main id="top" tabindex="-1">
+  <section class="hero" id="hero" aria-labelledby="title">
+    <div class="copy">
+      <h1 id="title">SIRIUS</h1>
+      <p class="lede">A second pair of eyes for people who are blind or have low vision.</p>
+      <p class="explain">Two small cameras sit side by side, like eyes. SIRIUS compares what each one sees to work out how far away things are, recognises what they are, and says it in a few words: <em>chair, three metres, left.</em></p>
+      <p class="explain">In the picture behind this text, each camera sends out its own wave, <span class="l">left</span> and <span class="r">right</span>. They start from opposite sides and cross. A point lights up once both have passed it, because only then can SIRIUS measure it.</p>
+      <p class="sr">The animation shows a dark room drawn in points. Two waves sweep in from the left and right edges and cross in the middle. The room lights up where both have passed: a person about a metre ahead, a chair to the left, a table with a bottle to the right. Each object is labelled with its distance.</p>
+      <div class="controls">
+        <button class="hear" id="hear" type="button" aria-pressed="false">Hear it</button>
+        <p class="caption" id="caption" aria-live="off"></p>
+      </div>
+    </div>
+    <dl class="facts">
+      <div><dt>2 cameras</dt><dd>about 12 cm apart</dd></div>
+      <div><dt>17</dt><dd>kinds of everyday objects</dd></div>
+      <div><dt>25 fps</dt><dd>pictures looked at a second</dd></div>
+      <div><dt>~50 ms</dt><dd>for the voice to start</dd></div>
+      <div><dt>Offline</dt><dd>no internet needed</dd></div>
+    </dl>
+  </section>
+
+  <section class="band" id="how" aria-labelledby="how-title">
+    <div class="wrap">
+      <h2 id="how-title">How it works</h2>
+      <p class="intro">Five steps, many times a second, on a laptop.</p>
+      <ol class="steps">
+        <li><h3>See</h3><p>Two small cameras sit about 12 cm apart. Each looks at the room 25 times a second, and every left picture is paired with the right one taken at the same moment.</p></li>
+        <li><h3>Measure</h3><p>A point close to you shifts a lot between the left and right picture. A point far away hardly moves. That shift becomes a distance for every point in view. The classic matcher takes about 17 ms a frame on the development laptop.</p></li>
+        <li><h3>Recognise</h3><p>A detector names what is in the picture: people, chairs, tables, bottles, cups, bags, bikes, cars, dogs and more. Seventeen kinds, chosen because they get in the way.</p></li>
+        <li><h3>Decide</h3><p>One thing at a time, the most urgent first. Nothing is repeated within five seconds, and a sentence that is more than a second old is dropped rather than said late.</p></li>
+        <li><h3>Speak</h3><p>A short sentence, spoken on the device with no internet. The voice starts about 50 ms after a sentence is chosen. Something urgent cuts off whatever was being said.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="band" id="says" aria-labelledby="says-title">
+    <div class="wrap">
+      <h2 id="says-title">It only speaks when it matters.</h2>
+      <p class="intro">People who are blind need their ears for traffic and voices, so SIRIUS keeps to three distance zones and one short sentence at a time.</p>
+      <div class="zones">
+        <div class="zone" style="--c: var(--urgent)"><h3>Urgent, under 1 metre</h3><p>Said straight away, cutting off anything else.</p><q>person, one metre, ahead</q></div>
+        <div class="zone" style="--c: var(--amber)"><h3>Near, 1 to 2.5 metres</h3><p>Said after anything urgent, closest first.</p><q>bench, two metres, right</q></div>
+        <div class="zone" style="--c: var(--aware)"><h3>Aware, 2.5 to 5 metres</h3><p>Said after anything closer.</p><q>chair, three metres, left</q></div>
+      </div>
+      <p class="quiet">If a camera goes dark or falls behind, SIRIUS still names the object but leaves the distance out. Until its two cameras are calibrated, the prototype can speak rough single-camera estimates instead, always with the word "about".</p>
+    </div>
+  </section>
+
+  <section class="band" id="status" aria-labelledby="status-title">
+    <div class="wrap">
+      <h2 id="status-title">Where it is today</h2>
+      <p class="intro">SIRIUS is a working prototype built on a bench: two webcams fixed to a ruler and a laptop.</p>
+      <div class="status">
+        <div><h3>Works now</h3><ul><li>Both cameras captured and paired</li><li>Objects recognised and tracked</li><li>Alerts decided and spoken</li><li>A live dashboard with a 3D view of the room</li></ul></div>
+        <div><h3>Not yet</h3><ul><li>Calibration on the real rig, so its distances are not trustworthy yet</li><li>Accuracy and speed measured end to end</li><li>Tried by anyone who is blind</li></ul></div>
+        <div><h3>Next</h3><ul><li>The cameras move onto a small Raspberry Pi worn by the user, with an infrared distance sensor added</li><li>It streams over Wi-Fi to the laptop</li><li>Later, the phone in the user's pocket does the computing</li></ul></div>
+      </div>
+      <p class="cane">SIRIUS is meant to go alongside a white cane, never instead of one.</p>
+    </div>
+  </section>
+
+  <section class="band" id="inside" aria-labelledby="inside-title">
+    <div class="wrap">
+      <h2 id="inside-title">Look inside</h2>
+      <div class="links">
+        <a href="https://github.com/RitvikDayal/sirius"><strong>Source code</strong><span>Python, with the tests, on GitHub</span></a>
+        <a href="https://github.com/RitvikDayal/sirius/blob/main/docs/README.md"><strong>Documentation</strong><span>How it is built, what was measured, what was learned</span></a>
+        <a href="https://github.com/RitvikDayal/sirius/blob/main/LICENSE"><strong>MIT licence</strong><span>Free to read, use and build on</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>Built by <a href="https://ritvikdayal.github.io/">Ritvik Dayal</a>.</span>
+  <span>A research prototype. Not a safety device.</span>
+</footer>
+
+<script type="module">
+  import { startScene, makeVoice } from "./scene.js";
+  const voice = makeVoice();
+  const hear = document.getElementById("hear");
+  if (!voice.supported) {
+    hear.disabled = true;
+    hear.textContent = "Speech is not available in this browser";
+  }
+  hear.addEventListener("click", () => {
+    const on = voice.toggle();
+    hear.setAttribute("aria-pressed", String(on));
+    if (!on) return;
+    voice.say("Sound on. SIRIUS will read out what it finds.");
+    // Without the animation (reduced motion, or no 3D support) nothing new is found, so read the scene once.
+    if (!scene.live) voice.say(document.getElementById("caption").textContent);
+  });
+  const scene = startScene({
+    canvas: document.getElementById("scene"),
+    hero: document.getElementById("hero"),
+    labelsRoot: document.getElementById("labels"),
+    captionEl: document.getElementById("caption"),
+    voice,
+  });
+</script>
+</body>
+</html>
