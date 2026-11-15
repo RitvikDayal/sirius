@@ -59,3 +59,7 @@ along the way, and the plan for the next phase.
 
 `src/sirius/viewer/static/` carries a copy of three.js r160 (MIT) so the dashboard works
 offline.
+
+## Licence
+
+MIT, see [LICENSE](LICENSE). The models keep their own licences, listed above.
