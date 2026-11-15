@@ -2,7 +2,7 @@
 // up once both have passed a point, because only then could SIRIUS measure it.
 import * as THREE from "./vendor/three.module.js";
 import { makeRoom, OBJECTS } from "./room.js";
-import { ZONES, phrase } from "./rules.js";
+import { ZONES, phrase, passWrapped } from "./rules.js";
 
 const PERIOD = 8.5;       // seconds per pass
 const SPEED = 1.45;       // metres per second
@@ -36,7 +36,8 @@ export function startScene({ canvas, hero, labelsRoot, captionEl, voice }) {
     renderer = new THREE.WebGLRenderer({ canvas, antialias: !small });
   } catch {
     document.documentElement.classList.add("no-webgl");
-    return { stop() {} };
+    captionEl.textContent = phrase("person", EYE, OBJECTS[1].at).text;
+    return { live: false, stop() {} };
   }
   renderer.setPixelRatio(Math.min(devicePixelRatio, small ? 1.5 : 2));
 
@@ -102,12 +103,13 @@ export function startScene({ canvas, hero, labelsRoot, captionEl, voice }) {
     return el;
   });
 
-  let said = new Set();
+  let said = new Set(), lastPhase = 0;
   function draw(s) {
     const t0 = performance.now();
     const phase = reduce ? PERIOD : s % PERIOD, r = reduce ? 99 : phase * SPEED;
     const fade = reduce ? 1 : Math.min(1, Math.max(0, (PERIOD - phase) / 0.9));
-    if (phase < 0.05) said = new Set();
+    if (passWrapped(lastPhase, phase)) said = new Set();
+    lastPhase = phase;
     for (let i = 0; i < N; i++) {
       gL[i] = Math.abs(dL[i] - r) < 0.13 ? 1 : gL[i] * 0.9;
       gR[i] = Math.abs(dR[i] - r) < 0.13 ? 1 : gR[i] * 0.9;
@@ -156,7 +158,7 @@ export function startScene({ canvas, hero, labelsRoot, captionEl, voice }) {
 
   if (reduce) {
     draw(0);
-    return { stop() {} };
+    return { live: false, stop() {} };
   }
 
   // Run only while the hero is on screen and the tab is visible.
@@ -171,5 +173,5 @@ export function startScene({ canvas, hero, labelsRoot, captionEl, voice }) {
   new IntersectionObserver(([e]) => { heroVisible = e.isIntersecting; update(); }, { threshold: 0.05 }).observe(hero);
   document.addEventListener("visibilitychange", update);
   update();
-  return { stop() { heroVisible = false; update(); } };
+  return { live: true, stop() { heroVisible = false; update(); } };
 }

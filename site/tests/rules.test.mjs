@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { distanceWords, zoneOf, direction, phrase } from "../rules.js";
+import { distanceWords, zoneOf, direction, phrase, passWrapped } from "../rules.js";
 import { makeRoom, OBJECTS } from "../room.js";
 
 // Same thresholds as src/sirius/alerts.py and src/sirius/fusion.py.
@@ -35,4 +35,10 @@ test("room data", () => {
   assert.equal(room.positions.length % 3, 0);
   assert.equal(room.tags.length, room.positions.length / 3);
   assert.deepEqual(OBJECTS.map(o => o.label), ["chair", "person", "table", "bottle"]);
+});
+
+test("a new pass is detected however large the frame step", () => {
+  assert.equal(passWrapped(8.4, 0.3), true);   // jumped over the start of the pass
+  assert.equal(passWrapped(8.4, 0.01), true);
+  assert.equal(passWrapped(2.0, 2.1), false);
 });

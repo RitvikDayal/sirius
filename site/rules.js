@@ -5,6 +5,11 @@ export const ZONES = [
   { name: "aware", max: 5.0, hex: 0x8A6A3A, css: "#B8935A" },
 ];
 
+// True when a new pass has begun, however far the last frame stepped.
+export function passWrapped(prevPhase, phase) {
+  return phase < prevPhase;
+}
+
 export function zoneOf(r) {
   for (const z of ZONES) if (r < z.max) return z;
   return null;

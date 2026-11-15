@@ -103,7 +103,7 @@
 </style>
 </head>
 <body>
-<a class="skip" href="#how">Skip to how it works</a>
+<a class="skip" href="#top">Skip to main content</a>
 <canvas id="scene" aria-hidden="true"></canvas>
 <div id="labels"></div>
 
@@ -114,7 +114,7 @@
   </nav>
 </header>
 
-<main id="top">
+<main id="top" tabindex="-1">
   <section class="hero" id="hero" aria-labelledby="title">
     <div class="copy">
       <h1 id="title">SIRIUS</h1>
@@ -131,7 +131,7 @@
       <div><dt>2 cameras</dt><dd>about 12 cm apart</dd></div>
       <div><dt>17</dt><dd>kinds of everyday objects</dd></div>
       <div><dt>25 fps</dt><dd>pictures looked at a second</dd></div>
-      <div><dt>~50 ms</dt><dd>until speech starts</dd></div>
+      <div><dt>~50 ms</dt><dd>for the voice to start</dd></div>
       <div><dt>Offline</dt><dd>no internet needed</dd></div>
     </dl>
   </section>
@@ -139,13 +139,13 @@
   <section class="band" id="how" aria-labelledby="how-title">
     <div class="wrap">
       <h2 id="how-title">How it works</h2>
-      <p class="intro">Five steps, many times a second, on an ordinary laptop.</p>
+      <p class="intro">Five steps, many times a second, on a laptop.</p>
       <ol class="steps">
         <li><h3>See</h3><p>Two small cameras sit about 12 cm apart. Each looks at the room 25 times a second, and every left picture is paired with the right one taken at the same moment.</p></li>
-        <li><h3>Measure</h3><p>A point close to you shifts a lot between the left and right picture. A point far away hardly moves. That shift becomes a distance for every point in view, in about 17 ms a frame.</p></li>
+        <li><h3>Measure</h3><p>A point close to you shifts a lot between the left and right picture. A point far away hardly moves. That shift becomes a distance for every point in view. The classic matcher takes about 17 ms a frame on the development laptop.</p></li>
         <li><h3>Recognise</h3><p>A detector names what is in the picture: people, chairs, tables, bottles, cups, bags, bikes, cars, dogs and more. Seventeen kinds, chosen because they get in the way.</p></li>
         <li><h3>Decide</h3><p>One thing at a time, the most urgent first. Nothing is repeated within five seconds, and a sentence that is more than a second old is dropped rather than said late.</p></li>
-        <li><h3>Speak</h3><p>A short sentence, spoken on the device with no internet. Speech starts in about 50 ms. Something urgent cuts off whatever was being said.</p></li>
+        <li><h3>Speak</h3><p>A short sentence, spoken on the device with no internet. The voice starts about 50 ms after a sentence is chosen. Something urgent cuts off whatever was being said.</p></li>
       </ol>
     </div>
   </section>
@@ -156,10 +156,10 @@
       <p class="intro">People who are blind need their ears for traffic and voices, so SIRIUS keeps to three distance zones and one short sentence at a time.</p>
       <div class="zones">
         <div class="zone" style="--c: var(--urgent)"><h3>Urgent, under 1 metre</h3><p>Said straight away, cutting off anything else.</p><q>person, one metre, ahead</q></div>
-        <div class="zone" style="--c: var(--amber)"><h3>Near, 1 to 2.5 metres</h3><p>Said when something first appears or moves into this zone.</p><q>bench, two metres, right</q></div>
-        <div class="zone" style="--c: var(--aware)"><h3>Aware, 2.5 to 5 metres</h3><p>Said once, after anything closer.</p><q>chair, three metres, left</q></div>
+        <div class="zone" style="--c: var(--amber)"><h3>Near, 1 to 2.5 metres</h3><p>Said after anything urgent, closest first.</p><q>bench, two metres, right</q></div>
+        <div class="zone" style="--c: var(--aware)"><h3>Aware, 2.5 to 5 metres</h3><p>Said after anything closer.</p><q>chair, three metres, left</q></div>
       </div>
-      <p class="quiet">If a camera goes dark or falls behind, SIRIUS still names the object but leaves the distance out. It never says a distance it did not measure.</p>
+      <p class="quiet">If a camera goes dark or falls behind, SIRIUS still names the object but leaves the distance out. Until its two cameras are calibrated, the prototype can speak rough single-camera estimates instead, always with the word "about".</p>
     </div>
   </section>
 
@@ -204,10 +204,12 @@
   hear.addEventListener("click", () => {
     const on = voice.toggle();
     hear.setAttribute("aria-pressed", String(on));
-    hear.textContent = on ? "Sound on" : "Hear it";
-    if (on) voice.say("Sound on. SIRIUS will read out what it finds.");
+    if (!on) return;
+    voice.say("Sound on. SIRIUS will read out what it finds.");
+    // Without the animation (reduced motion, or no 3D support) nothing new is found, so read the scene once.
+    if (!scene.live) voice.say(document.getElementById("caption").textContent);
   });
-  startScene({
+  const scene = startScene({
     canvas: document.getElementById("scene"),
     hero: document.getElementById("hero"),
     labelsRoot: document.getElementById("labels"),
