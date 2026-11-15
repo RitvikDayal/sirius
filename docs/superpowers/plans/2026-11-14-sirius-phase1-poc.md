@@ -8,7 +8,7 @@
 
 **Tech Stack:** Python 3.11, uv, OpenCV (contrib, for ArUco/ChArUco), NumPy, PyTorch cu128, transformers (D-FINE, Depth Anything V2 metric), onnxruntime-gpu (Fast-FoundationStereo ONNX), supervision (ByteTrack), pywin32 (SAPI voice), pytest.
 
-**Spec:** `C:\Users\LENOVO\Projects\Personal\Uddhava\03-projects\sirius\_plans\2026-11-14-sirius-poc-design.md` (approved 2026-11-14). Research: `...\Uddhava\04-research\topics\stereo-navigation-aid\survey.md`.
+**Spec:** the approved Phase 1 design (2026-11-14), kept in the author's notes. Its content is summarised in `docs/overview.md`.
 
 ## Global Constraints
 

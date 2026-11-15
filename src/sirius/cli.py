@@ -260,7 +260,7 @@ def cmd_bakeoff_score(args) -> int:
         "# M1 depth bake-off", "",
         "Median distance error per method and taped distance (target: <=10% to 3 m, <=20% at 5 m).", "",
         summarise(scores), "",
-        f"**Default chosen:** `{default}`" if default else "**No stereo method met the targets. Stopped for Ritvik's call.**", "",
+        f"**Default chosen:** `{default}`" if default else "**No stereo method met the targets. Stopped for a decision.**", "",
         "## Reproducibility", "", "```yaml",
         f"hardware: {torch.cuda.get_device_name(0)}, {platform.platform()}",
         f"framework_version: {{torch: {torch.__version__}, onnxruntime: {onnxruntime.__version__}, opencv: {cv2.__version__}, numpy: {np.__version__}}}",
