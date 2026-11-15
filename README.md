@@ -2,6 +2,8 @@
 
 > **Research prototype. Not a safety device.** It is meant to sit alongside a white cane, never to replace one.
 
+Project page: **https://ritvikdayal.github.io/sirius/**
+
 SIRIUS is an experiment in giving a blind or low-vision person a second pair of eyes. Two
 matched cameras look ahead, a detector names what is in view, a depth estimator works out
 how far away each thing is, and the computer speaks a short alert such as

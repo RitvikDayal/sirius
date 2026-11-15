@@ -1,7 +1,8 @@
 # SIRIUS documentation
 
 Read these roughly in order if you are new to the project. If you only want to run it, go
-straight to getting started.
+straight to getting started. For a quick picture of what SIRIUS does, the project page is
+at https://ritvikdayal.github.io/sirius/ and its source is in `site/`.
 
 | Document | What it covers |
 |---|---|
