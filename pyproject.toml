@@ -1,0 +1,43 @@
+[project]
+name = "sirius"
+version = "0.1.0"
+description = "Binocular-vision navigation aid prototype: stereo depth + object recognition + spoken alerts"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "huggingface-hub>=2.4.0",
+    "numpy",
+    "onnxruntime-gpu==1.26.0",
+    "opencv-contrib-python",
+    "pillow>=13.0.0",
+    "pywin32>=312",
+    "torch>=2.11.0",
+    "torchvision>=0.26.0",
+    "transformers>=5.23.0",
+]
+
+[project.scripts]
+sirius = "sirius.cli:main"
+
+[dependency-groups]
+dev = ["pytest"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sirius"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["tests"]
+markers = ["gpu: needs the CUDA GPU and downloaded models", "hardware: needs the live cameras"]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu128" }
+torchvision = { index = "pytorch-cu128" }
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true

@@ -1,0 +1,7 @@
+data/
+.venv/
+__pycache__/
+*.onnx
+*.pth
+.superpowers/
+.pytest_cache/

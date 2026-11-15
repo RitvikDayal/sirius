@@ -1,0 +1,19 @@
+# SIRIUS rig. Cameras are bound by DirectShow device path: both report "USB Camera".
+# Path fragments are tied to the USB port; swapping the plugs swaps left and right.
+left_path = "6&1ec6b2f7"    # USB port 7
+right_path = "6&315a9f63"   # USB port 8
+width = 1280
+height = 720
+fps = 30
+# baseline_mm_measured = 0.0   # 👤 lens centre-to-centre, to 1 mm
+depth_method = "sgbm"
+depth_scale = 0.5
+# Ritvik 2026-11-14: hear distances now; single-camera estimates are said with "about" until calibration.
+speak_approx_distances = true
+
+[charuco]
+cols = 7
+rows = 5
+square_mm = 35.0   # 👤 measure the printed square to 0.1 mm
+marker_mm = 26.0   # 👤 measure the printed marker
+dictionary = "DICT_5X5_100"
